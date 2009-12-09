@@ -10,3 +10,13 @@ describe('Example', function(){
 	});
 
 });
+
+describe('Another example', function(){
+
+	it('should pass again', function(){
+
+		expect(0).toBe(0);
+
+	});
+
+});
