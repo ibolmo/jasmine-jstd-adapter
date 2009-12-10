@@ -58,6 +58,24 @@ jasmine.NestedResults.prototype.addResult = (function(addResult){
 })(jasmine.NestedResults.prototype.addResult);
 
 
+jstestdriver.plugins.TestRunnerPlugin.prototype.runTestConfiguration = (function(runTestConfiguration){
+
+	return function(testRunConfiguration, onTestDone, onTestRunConfigurationComplete){
+		console.log('before');
+		onTestRunConfigurationComplete = (function(configurationComplete){
+
+			return function() {
+				console.log('after');
+				configurationComplete();
+			};
+
+		})(onTestRunConfigurationComplete);
+		runTestConfiguration.call(this, testRunConfiguration, onTestDone, onTestRunConfigurationComplete);
+	};
+
+})(jstestdriver.plugins.TestRunnerPlugin.prototype.runTestConfiguration);
+
+
 // Reset environment with overriden methods.
 jasmine.currentEnv_ = null;
 jasmine.getEnv();
