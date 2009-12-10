@@ -1,3 +1,13 @@
+var decrement = 0;
+var mult = 1;
+
+beforeEach(function(){
+	decrement--;
+});
+
+afterEach(function(){
+	mult *= 2;
+});
 
 describe('Example', function(){
 
@@ -33,9 +43,19 @@ describe('Example', function(){
 describe('Another example', function(){
 
 	it('should pass again', function(){
-
 		expect(0).toBe(0);
+	});
 
+});
+
+describe('beforeEach and afterEach example', function(){
+
+	it('beforeEach suite should decrement', function(){
+		expect(decrement).toBe(-3);
+	});
+
+	it('afterEach suite should multiply', function(){
+		expect(mult).toBe(4);
 	});
 
 });

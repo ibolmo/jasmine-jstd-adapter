@@ -3,6 +3,11 @@
  * @author ibolmo@gmail.com (Olmo Maldonado)
  */
 
+(function() {
+
+// Suite/TestCase before and after function stacks.
+var before = [];
+var after = [];
 
 jasmine.Env.prototype.describe = (function(describe){
 
@@ -31,7 +36,11 @@ jasmine.Env.prototype.beforeEach = (function(beforeEach){
 	// TODO(ibolmo): Support beforeEach TestCase.
 	return function(beforeEachFunction) {
 		beforeEach.call(this, beforeEachFunction);
-		this.currentTestCase.prototype.setUp = beforeEachFunction;
+		if (this.currentTestCase) {
+			this.currentTestCase.prototype.setUp = beforeEachFunction;
+		} else {
+			before.push(beforeEachFunction);
+		}
 	};
 
 })(jasmine.Env.prototype.beforeEach);
@@ -42,7 +51,11 @@ jasmine.Env.prototype.afterEach = (function(afterEach){
 	// TODO(ibolmo): Support afterEach TestCase.
 	return function(afterEachFunction) {
 		afterEach.call(this, afterEachFunction);
-		this.currentTestCase.prototype.tearDown = afterEachFunction;
+		if (this.currentTestCase) {
+			this.currentTestCase.prototype.tearDown = afterEachFunction;
+		} else {
+			after.push(afterEachFunction);
+		}
 	};
 
 })(jasmine.Env.prototype.afterEach);
@@ -61,11 +74,11 @@ jasmine.NestedResults.prototype.addResult = (function(addResult){
 jstestdriver.plugins.TestRunnerPlugin.prototype.runTestConfiguration = (function(runTestConfiguration){
 
 	return function(testRunConfiguration, onTestDone, onTestRunConfigurationComplete){
-		console.log('before');
+		for (var i = 0, l = before.length; i < l; i++) before[i]();
 		onTestRunConfigurationComplete = (function(configurationComplete){
 
 			return function() {
-				console.log('after');
+				for (var i = 0, l = after.length; i < l; i++) after[i]();
 				configurationComplete();
 			};
 
@@ -79,3 +92,5 @@ jstestdriver.plugins.TestRunnerPlugin.prototype.runTestConfiguration = (function
 // Reset environment with overriden methods.
 jasmine.currentEnv_ = null;
 jasmine.getEnv();
+
+})();
