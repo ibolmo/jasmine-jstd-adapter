@@ -41,11 +41,9 @@
 
   jasmine.Env.prototype.describe = (function(describe){
     return function(description){
-      console.log("BEGIN: " + description)
       currentFrame = frame(currentFrame, description);
       var val = describe.apply(this, arguments);
       currentFrame = currentFrame.parent;
-      console.log("END: " + description)
       return val;
     };
 
@@ -54,7 +52,6 @@
 
   jasmine.Env.prototype.it = (function(it){
     return function(desc, itFn){
-      console.log("BEGIN: " + desc)
       var self = this;
       var spec = it.apply(this, arguments);
       var currentSpec = this.currentSpec;
@@ -67,7 +64,6 @@
           frame.runAfter.apply(currentSpec);
         }
       };
-      console.log("END: " + desc)
       return spec;
     };
 
