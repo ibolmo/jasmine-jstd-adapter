@@ -1,61 +1,58 @@
-var decrement = 0;
-var mult = 1;
+var depth;
 
 beforeEach(function(){
-	decrement--;
+  depth = 1;
 });
 
 afterEach(function(){
-	mult *= 2;
+  expect(depth).toEqual(1);
 });
 
-describe('Example', function(){
+describe('describe', function(){
+  beforeEach(function(){
+    depth ++;
+  });
 
-	var increment = 0;
-	var list = [];
+  afterEach(function(){
+    depth--;
+  });
 
-	beforeEach(function(){
-		increment++;
-	});
+  it('should map it', function(){
+    expect(depth).toEqual(2);
+  });
 
-	afterEach(function(){
-		list.push(0);
-	});
+  describe('nested', function(){
+    beforeEach(function(){
+      depth ++;
+    });
 
-	it('should pass', function(){
-		expect(0).toBe(0);
-	});
+    afterEach(function(){
+      depth--;
+    });
 
-	it('should fail', function(){
-		expect(0).toBe(1);
-	});
-
-	it('beforeEach should have incremented', function(){
-		expect(increment).toBe(3);
-	});
-
-	it('afterEach should have appended an element to the list', function(){
-		expect(list.length).toBe(3);
-	});
-
+    it('should exectue nested', function(){
+      expect(depth).toEqual(3);
+    });
+  });
 });
 
-describe('Another example', function(){
+describe("matchers", function(){
 
-	it('should pass again', function(){
-		expect(0).toBe(0);
-	});
+  beforeEach(function(){
+    this.addMatchers({
+      toBePersonNamed: function(name){
+        return this.actual == name;
+      }
+    });
+  });
 
-});
-
-describe('beforeEach and afterEach example', function(){
-
-	it('beforeEach suite should decrement', function(){
-		expect(decrement).toBe(-3);
-	});
-
-	it('afterEach suite should multiply', function(){
-		expect(mult).toBe(4);
-	});
-
+  it('should allow a creation of new matcher', function(){
+    this.addMatchers({
+      toBeMe: function(arg){
+        return this.actual == 'misko';
+      }
+    });
+    expect('misko').toBeMe();
+    expect('adam').toBePersonNamed('adam');
+  });
 });
