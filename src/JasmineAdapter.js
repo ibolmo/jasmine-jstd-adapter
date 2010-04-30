@@ -6,17 +6,14 @@
 
 (function() {
 
-  function bind(_this, _function){
-    return function(){
-      return _function.call(_this);
-    }
-  }
-
   var currentFrame = frame(null, null);
 
   function frame(parent, name){
-    var caseName = (parent && parent.caseName ? parent.caseName + " " : '') + (name ? name : '');
-    var frame = {
+  	var caseName = '';
+  	if (parent && parent.caseName) caseName = parent.caseName + ' ';
+  	if (name) caseName += name;
+  	    
+    return {
       name: name,
       caseName: caseName,
       parent: parent,
@@ -25,70 +22,69 @@
       after: [],
       runBefore: function(){
         if (parent) parent.runBefore.apply(this);
-        for ( var i = 0; i < frame.before.length; i++) {
-          frame.before[i].apply(this);
-        }
+        for (var i = 0, l = frame.before.length; i < l; i++) frame.before[i].apply(this);
       },
       runAfter: function(){
-        for ( var i = 0; i < frame.after.length; i++) {
-          frame.after[i].apply(this);
-        }
+        for (var i = 0, l = frame.after.length; i < l; i++) frame.after[i].apply(this);
         if (parent) parent.runAfter.apply(this);
       }
     };
-    return frame;
   };
 
   jasmine.Env.prototype.describe = (function(describe){
-    return function(description){
+
+    return function(description, context){
       currentFrame = frame(currentFrame, description);
-      var val = describe.apply(this, arguments);
+      var result = describe.call(this, description, context);
       currentFrame = currentFrame.parent;
-      return val;
+      return result;
     };
 
   })(jasmine.Env.prototype.describe);
 
 
   jasmine.Env.prototype.it = (function(it){
-    return function(desc, itFn){
-      var self = this;
-      var spec = it.apply(this, arguments);
+  	
+    return function(description, closure){
+      var result = it.call(this, description, content);
       var currentSpec = this.currentSpec;
       var frame = this.jstdFrame = currentFrame;
-      this.jstdFrame.testCase.prototype['test that it ' + desc] = function(){
+      this.jstdFrame.testCase.prototype['test that it ' + description] = function(){
         frame.runBefore.apply(currentSpec);
         try {
-          itFn.apply(currentSpec);
+          closure.apply(currentSpec);
         } finally {
           frame.runAfter.apply(currentSpec);
         }
       };
-      return spec;
+      return result;
     };
 
   })(jasmine.Env.prototype.it);
 
 
   jasmine.Env.prototype.beforeEach = (function(beforeEach){
-    return function(beforeEachFunction) {
-      beforeEach.apply(this, arguments);
-      currentFrame.before.push(beforeEachFunction);
+  	
+    return function(closure) {
+      beforeEach.call(this, closure);
+      currentFrame.before.push(closure);
     };
 
   })(jasmine.Env.prototype.beforeEach);
 
 
   jasmine.Env.prototype.afterEach = (function(afterEach){
-    return function(afterEachFunction) {
-      afterEach.apply(this, arguments);
-      currentFrame.after.push(afterEachFunction);
+  	
+    return function(closure) {
+      afterEach.call(this, closure);
+      currentFrame.after.push(closure);
     };
 
   })(jasmine.Env.prototype.afterEach);
 
 
   jasmine.NestedResults.prototype.addResult = (function(addResult){
+  	
     return function(result) {
       addResult.call(this, result);
       if (result.type != 'MessageResult' && !result.passed()) fail(result.message);
