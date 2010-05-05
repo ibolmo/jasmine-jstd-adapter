@@ -46,13 +46,23 @@ describe("matchers", function(){
     });
   });
 
+  it('should work across multiple tests', function(){
+    expect('misko').toBePersonNamed('misko');
+  });
+
   it('should allow a creation of new matcher', function(){
     this.addMatchers({
       toBeMe: function(arg){
         return this.actual == 'misko';
       }
     });
+    this.addMatchers({
+      toBeMe2: function(arg){
+        return this.actual == 'misko';
+      }
+    });
     expect('misko').toBeMe();
+    expect('misko').toBeMe2();
     expect('adam').toBePersonNamed('adam');
   });
 });
