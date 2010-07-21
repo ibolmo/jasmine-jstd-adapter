@@ -12,20 +12,23 @@
   	var caseName = '';
   	if (parent && parent.caseName) caseName = parent.caseName + ' ';
   	if (name) caseName += name;
-  	    
+
+	var before = [],
+		after = [];
+
     return {
       name: name,
       caseName: caseName,
       parent: parent,
       testCase: TestCase(caseName),
-      before: [],
-      after: [],
+      before: before,
+      after: after,
       runBefore: function(){
         if (parent) parent.runBefore.apply(this);
-        for (var i = 0, l = frame.before.length; i < l; i++) frame.before[i].apply(this);
+        for (var i = 0, l = before.length; i < l; i++) before[i].apply(this);
       },
       runAfter: function(){
-        for (var i = 0, l = frame.after.length; i < l; i++) frame.after[i].apply(this);
+        for (var i = 0, l = after.length; i < l; i++) after[i].apply(this);
         if (parent) parent.runAfter.apply(this);
       }
     };
@@ -46,7 +49,7 @@
   jasmine.Env.prototype.it = (function(it){
   	
     return function(description, closure){
-      var result = it.call(this, description, content);
+      var result = it.call(this, description, closure);
       var currentSpec = this.currentSpec;
       var frame = this.jstdFrame = currentFrame;
       this.jstdFrame.testCase.prototype['test that it ' + description] = function(){
