@@ -44,7 +44,7 @@
     };
 
   })(jasmine.Env.prototype.describe);
- console.log('yo');
+  
   jasmine.Env.prototype.it = (function(it){
   	
     return function(description, closure){

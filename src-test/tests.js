@@ -1,3 +1,5 @@
+(function(){
+
 var depth;
 
 beforeEach(function(){
@@ -10,7 +12,7 @@ afterEach(function(){
 
 describe('describe', function(){
   beforeEach(function(){
-    depth ++;
+    depth++;
   });
 
   afterEach(function(){
@@ -23,7 +25,7 @@ describe('describe', function(){
 
   describe('nested', function(){
     beforeEach(function(){
-      depth ++;
+      depth++;
     });
 
     afterEach(function(){
@@ -52,17 +54,19 @@ describe("matchers", function(){
 
   it('should allow a creation of new matcher', function(){
     this.addMatchers({
-      toBeMe: function(arg){
+      toBeMe: function(){
         return this.actual == 'misko';
       }
     });
     this.addMatchers({
       toBeMe2: function(arg){
-        return this.actual == 'misko';
+        return this.actual == arg;
       }
     });
     expect('misko').toBeMe();
-    expect('misko').toBeMe2();
+    expect('misko').toBeMe2('misko');
     expect('adam').toBePersonNamed('adam');
   });
 });
+
+})();
