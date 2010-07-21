@@ -45,12 +45,17 @@
 
   })(jasmine.Env.prototype.describe);
 
+  var id = 0;
 
   jasmine.Env.prototype.it = (function(it){
   	
     return function(description, closure){
       var result = it.call(this, description, closure);
       var currentSpec = this.currentSpec;
+	  if (!currentSpec.$id){
+		  currentSpec.$id = id++;
+	  }
+
       var frame = this.jstdFrame = currentFrame;
       var name = 'test that it ' + desc;
       if (this.jstdFrame.testCase.prototype[name])
