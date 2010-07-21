@@ -1,1 +1,1 @@
-java -jar ../jstestdriver/JsTestDriver.jar --tests all --reset
+java -jar ../../jstestdriver/JsTestDriver.jar --tests all --reset
