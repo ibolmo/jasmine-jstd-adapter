@@ -44,22 +44,18 @@
     };
 
   })(jasmine.Env.prototype.describe);
-
-  var id = 0;
-
+ console.log('yo');
   jasmine.Env.prototype.it = (function(it){
   	
     return function(description, closure){
       var result = it.call(this, description, closure);
       var currentSpec = this.currentSpec;
-	  if (!currentSpec.$id){
-		  currentSpec.$id = id++;
-	  }
 
-      var frame = this.jstdFrame = currentFrame;
-      var name = 'test that it ' + desc;
+	  var frame = this.jstdFrame = currentFrame;
+      var name = 'test that it ' + description;
+	 
       if (this.jstdFrame.testCase.prototype[name])
-        throw "Spec with name '" + desc + "' already exists.";
+        throw "Spec with name '" + description + "' already exists.";
       this.jstdFrame.testCase.prototype[name] = function(){
         jasmine.getEnv().currentSpec = currentSpec;
         frame.runBefore.apply(currentSpec);
