@@ -49,15 +49,14 @@ jasmine.Env.prototype.it = function(description, closure){
 
 	if (this.jstdFrame.testCase.prototype[name])
 		throw "Spec with name '" + description + "' already exists.";
-
+	
 	this.jstdFrame.testCase.prototype[name] = function(){
 		jasmine.getEnv().currentSpec = currentSpec;
 		frame.runBefore.apply(currentSpec);
 		try {
 			closure.apply(currentSpec);
-		} finally {
-			frame.runAfter.apply(currentSpec);
-		}
+		} catch(e){}
+		frame.runAfter.apply(currentSpec);
 	};
 	return result;
 };
