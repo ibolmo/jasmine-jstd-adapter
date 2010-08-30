@@ -69,4 +69,23 @@ describe("matchers", function(){
   });
 });
 
+describe('runs', function(){
+  it('should execute a runs block', function(){
+    runs(function(){
+      this.runsFunction = function(){
+        return true;
+      };
+      spyOn(this, 'runsFunction');
+    });
+
+    runs(function(){
+      this.runsFunction();
+    });
+
+    runs(function(){
+      expect(this.runsFunction).wasCalled();
+    });
+  });
+});
+
 })();

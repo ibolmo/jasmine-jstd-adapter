@@ -54,7 +54,7 @@ jasmine.Env.prototype.it = function(description, closure){
 		jasmine.getEnv().currentSpec = currentSpec;
 		frame.runBefore.apply(currentSpec);
 		try {
-			closure.apply(currentSpec);
+			currentSpec.queue.start();
 		} catch(e){}
 		frame.runAfter.apply(currentSpec);
 	};
