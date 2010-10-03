@@ -5,7 +5,7 @@ Author
 ------
 me@ibolmo.com (Olmo Maldonado)
 misko@hevery.com (Misko Hevery)
-
+christoph.pojer@gmail.com (Christoph Pojer)
 
 Installing
 ----------
