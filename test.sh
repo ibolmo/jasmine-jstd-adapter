@@ -20,4 +20,4 @@ else
   echo "Running '$TESTS'"
 fi
 
-java -jar $JSTD --reset --tests $TESTS
+java -jar $JSTD --reset --tests "$TESTS"
