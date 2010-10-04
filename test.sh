@@ -10,7 +10,7 @@ done
 
 if [ -z "$JSTD" ]; then
 	#statements
-	JSTD="./lib/JsTestDriver.jar"
+	JSTD=`ls ../jstestdriver/[jJ]s[tT]est[dD]river*.jar`
 fi
 
 if [ -z "$TESTS" ]; then
