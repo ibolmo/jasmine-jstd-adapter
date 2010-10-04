@@ -1,10 +1,23 @@
-if [ $# -eq 1 ]; then
-	JSTD=$1
-fi
+#!/bin/bash
+while getopts  "j:t:" flag
+do
+  if [ $flag == "j" ]; then
+    JSTD=$OPTARG
+  elif [ $flag == "t" ]; then
+    TESTS=$OPTARG
+  fi
+done
 
 if [ -e $JSTD ]; then
 	#statements
 	JSTD=`ls ../jstestdriver/[jJ]s[tT]est[dD]river*.jar`
 fi
 
-java -jar $JSTD --tests all --reset
+if [ -e $TESTS ]; then
+  TESTS="all"
+  echo "Running all tests"
+else
+  echo "Running '$TESTS'"
+fi
+
+java -jar $JSTD --reset --tests $TESTS

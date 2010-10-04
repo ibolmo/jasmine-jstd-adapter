@@ -55,8 +55,9 @@ jasmine.Env.prototype.it = function(description, closure){
 		frame.runBefore.apply(currentSpec);
 		try {
 			currentSpec.queue.start();
-		} catch(e){}
-		frame.runAfter.apply(currentSpec);
+		} finally {
+		  frame.runAfter.apply(currentSpec);
+		}
 	};
 	return result;
 };
