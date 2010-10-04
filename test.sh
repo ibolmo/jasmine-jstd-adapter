@@ -8,12 +8,12 @@ do
   fi
 done
 
-if [ -e $JSTD ]; then
+if [ -z "$JSTD" ]; then
 	#statements
-	JSTD=`ls ../jstestdriver/[jJ]s[tT]est[dD]river*.jar`
+	JSTD="./lib/JsTestDriver.jar"
 fi
 
-if [ -e $TESTS ]; then
+if [ -z "$TESTS" ]; then
   TESTS="all"
   echo "Running all tests"
 else
