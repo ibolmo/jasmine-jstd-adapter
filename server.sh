@@ -1,9 +1,18 @@
-if [ $# -eq 1 ]; then
-	JSTD=$1
+#!/bin/bash
+while getopts  "j:p:" flag
+do
+  if [ $flag == "j" ]; then
+    JSTD=$OPTARG
+  elif [ $flag == "p" ]; then
+    PORT=$OPTARG
+  fi
+done
+
+if [ -z "$PORT" ]; then
+	PORT=9876
 fi
 
-if [ -e $JSTD ]; then
-	#statements
+if [ -z "$JSTD" ]; then
 	JSTD=`ls ../jstestdriver/[jJ]s[tT]est[dD]river*.jar`
 fi
 

@@ -9,7 +9,6 @@ do
 done
 
 if [ -z "$JSTD" ]; then
-	#statements
 	JSTD=`ls ../jstestdriver/[jJ]s[tT]est[dD]river*.jar`
 fi
 
