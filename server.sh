@@ -16,4 +16,4 @@ if [ -z "$JSTD" ]; then
 	JSTD=`ls ../jstestdriver/[jJ]s[tT]est[dD]river*.jar`
 fi
 
-java -jar $JSTD --port 9876 --runnerMode DEBUG
+java -jar $JSTD --port $PORT --runnerMode DEBUG
