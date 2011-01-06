@@ -79,13 +79,11 @@ jasmine.NestedResults.prototype.addResult = function(result) {
 
 // @reesd - Disable the catch on exceptions when using JSTD, we want them to make it up to JSTD
 jasmine.Block.prototype.execute = function(onComplete) {
-    try {
-      this.func.apply(this.spec);
-//    } catch (e) {
-//      this.spec.fail(e);
-    } finally {
-      onComplete();
-    }
+	try {
+		this.func.apply(this.spec);
+	} finally {
+		onComplete();
+	}
 };
 
 // Reset environment with overriden methods.
