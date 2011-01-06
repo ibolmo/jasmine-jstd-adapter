@@ -4,72 +4,23 @@
  */
 
 (function(window) {
-  var testNameFilter;
+  var rootDescribes = new Describes(window);
   var describePath = [];
-  var exclusive = {
-      count: 0
-  };
-  function exclusiveRemove(name) {
-    var name = describePath.join(' ') + ':' + (name||'');
-    if (exclusive[name]) {
-      exclusive.count--;
-      delete exclusive[name];
-    }
-  }
-  function exclusiveAdd(name) {
-    var name = describePath.join(' ') + ':' + (name||'');
-    if (!exclusive[name]) {
-      exclusive.count++;
-      exclusive[name] = true;
-    }
-  }
-  window.it = function(name, fn){
-    exclusiveRemove(name);
-    jasmine.getEnv().it(name, fn);
-  };
-  window.iit = function(name, fn){
-    exclusiveAdd(name);
-    jasmine.getEnv().it(name, fn);
-  };
-  window.describe = function(name, fn){
-    try {
-      describePath.push(name);
-      exclusiveRemove();
-      jasmine.getEnv().describe(name, fn);
-    } finally {
-      describePath.pop(name);
-    }
-  };
-  window.ddescribe = function(name, fn){
-    try {
-      describePath.push(name);
-      exclusiveAdd();
-      jasmine.getEnv().describe(name, fn);
-    } finally {
-      describePath.pop(name);
-    }
-  };
+  rootDescribes.collectMode();
+  
+  var jasmineTest = TestCase('Jasmine Adapter Tests');
+  
   var jasminePlugin = {
       name:'jasmine',
-      getTestRunsConfigurationFor:function(testCaseInfos, filterExpressions, testRunsConfiguration) {
-        testNameFilter = function(name){
-          return !filterExpressions ||
-            filterExpressions == 'all' ||
-            filterExpressions == '*' ||
-            name.indexOf(filterExpressions) > -1;
-        };
-        var describe = new jstestdriver.TestCaseInfo('jasmine runner', function(){});
-        testRunsConfiguration.push(new jstestdriver.TestRunConfiguration(describe, []));
-      },
       runTestConfiguration: function(testRunConfiguration, onTestDone, onTestRunConfigurationComplete){
-        var jasmineEnv = jasmine.getEnv();
+        if (testRunConfiguration.testCaseInfo_.template_ !== jasmineTest) return;
+        
+        var jasmineEnv = jasmine.currentEnv_ = new jasmine.Env();
+        rootDescribes.playback();
         var specLog = jstestdriver.console.log_ = [];
         var start;
         jasmineEnv.specFilter = function(spec) {
-          var name = spec.suite.getFullName() + ':';
-          var fullName = name + spec.description;
-          return testNameFilter(fullName) && 
-            (!exclusive.count || exclusive[name] || exclusive[fullName]);
+          return rootDescribes.isExclusive(spec);
         };
         jasmineEnv.reporter = {
           log: function(str){
@@ -117,9 +68,87 @@
         jasmineEnv.execute();
         return true;
       },
-      onTestsFinish: function(){}
+      onTestsFinish: function(){
+        jasmine.currentEnv_ = null;
+        rootDescribes.collectMode();
+      }
   };
   jstestdriver.pluginRegistrar.register(jasminePlugin);
+  
+  function noop(){}
+  function Describes(window){
+    var describes = {};
+    var beforeEachs = {};
+    var afterEachs = {};
+    var exclusive;
+    var collectMode = true;
+    intercept('describe', describes);
+    intercept('xdescribe', describes);
+    intercept('beforeEach', beforeEachs);
+    intercept('afterEach', afterEachs);
+    
+    function intercept(functionName, collection){
+      window[functionName] = function(desc, fn){
+        if (collectMode) {
+          collection[desc] = function(){
+            jasmine.getEnv()[functionName](desc, fn);
+          };
+        } else {
+          jasmine.getEnv()[functionName](desc, fn);
+        }
+      };
+    }
+    window.ddescribe = function(name, fn){
+      exclusive = true;
+      console.log('ddescribe', name);
+      window.describe(name, function(){
+        var oldIt = window.it;
+        window.it = window.iit;
+        try {
+          fn.call(this);
+        } finally {
+          window.it = oldIt;
+        };
+      });
+    };
+    window.iit = function(name, fn){
+      exclusive = fn.exclusive = true;
+      console.log(fn);
+      jasmine.getEnv().it(name, fn);
+    };
+    
+    
+    this.collectMode = function() {
+      collectMode = true;
+      exclusive = false;
+    };
+    this.playback = function(){
+      collectMode = false;
+      playback(beforeEachs);
+      playback(afterEachs);
+      playback(describes);
+      
+      function playback(set) {
+        for ( var name in set) {
+          set[name]();
+        }
+      }
+    };
+    
+    this.isExclusive = function(spec) {
+      if (exclusive) {
+        var blocks = spec.queue.blocks;
+        for ( var i = 0; i < blocks.length; i++) {
+          if (blocks[i].func.exclusive) {
+            return true;
+          }
+        }
+        return false;
+      }
+      return true;
+    };
+  }
+  
 })(window);
 
 // Patch Jasmine for proper stack traces
