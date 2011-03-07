@@ -8,7 +8,7 @@
   var describePath = [];
   rootDescribes.collectMode();
   
-  var jasmineTest = TestCase('Jasmine Adapter Tests');
+  var jasmineTest = TestCase('Jasmine Adapter Tests', null, 'jasmine test case');
   
   var jasminePlugin = {
       name:'jasmine',
