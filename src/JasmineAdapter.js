@@ -3,8 +3,66 @@
  * @author misko@hevery.com (Misko Hevery)
  * @author olmo.maldonado@gmail.com (Olmo Maldonado)
  */
-(function() {
+(function(){
+
+var Reporter = function(onTestDone, onTestRunConfigurationComplete){
+	this.onTestDone = onTestDone;
+	this.onTestRunConfigurationComplete = onTestRunConfigurationComplete;
+	this.reset();
+};
+
+jasmine.util.inherit(Reporter, jasmine.Reporter);
+
+
+Reporter.prototype.reset = function(){
+	this.specLog = jstestdriver.console.log_ = [];
+};
+
+
+Reporter.prototype.log = function(str){
+	this.specLog.push(str);
+};
+
+
+Reporter.prototype.reportSpecStarting = function(){
+	this.reset();
+	this.start = +new Date();
+};
+
+
+Reporter.prototype.reportSpecResults = function(spec){
+	var elapsed = +new Date() - this.start, results = spec.results();
 	
+	if (results.skipped) return;
+	
+	var item, state = 'passed', items = results.getItems(), l = items.length, messages = new Array(l);
+	for (var i = 0; i < l; i++){
+		item = items[i];
+		if (item.passed()) continue;
+		state = (item.message.indexOf('AssertionError:') != -1) ? 'error' : 'failed';
+		messages.push({
+			message: item + '',
+			name: item.trace.name,
+			stack: formatStack(item.trace.stack)
+		});
+	}
+	
+	this.onTestDone(new jstestdriver.TestResult(
+		spec.suite.getFullName(),
+		spec.description,
+		state,
+		jstestdriver.angular.toJson(messages),
+		this.specLog.join('\n'),
+		elapsed
+	));
+};
+
+
+Reporter.prototype.reportRunnerResults = function(){
+	this.onTestRunConfigurationComplete();
+};
+
+
 	var describes = [], beforeEachs = [], afterEachs = [];
 	
 	// Here we store:
@@ -32,8 +90,6 @@
 			playback(beforeEachs);
 			playback(afterEachs);
 			playback(describes);
-				
-			var start, specLog = jstestdriver.console.log_ = [];
 			
 			jasmineEnv.specFilter = function(spec) {
 				if (!exclusive) return true;
@@ -42,49 +98,7 @@
 				return false;
 			};
 				
-			jasmineEnv.reporter = {
-					
-				log: function(str){
-					specLog.push(str);
-				},
-
-				reportSpecStarting: function(){
-					specLog = jstestdriver.console.log_ = [];
-					start = +new Date();
-				},
-
-				reportSpecResults: function(spec){
-					var elapsed = +new Date() - start, results = spec.results();
-					
-					if (results.skipped) return;
-					
-					var item, state = 'passed', items = results.getItems(), l = items.length, messages = new Array(l);
-					for (var i = 0; i < l; i++){
-						item = items[i];
-						if (item.passed()) continue;
-						state = (item.message.indexOf('AssertionError:') != -1) ? 'error' : 'failed';
-						messages.push({
-							message: item + '',
-							name: item.trace.name,
-							stack: formatStack(item.trace.stack)
-						});
-					}
-					
-					onTestDone(new jstestdriver.TestResult(
-						spec.suite.getFullName(),
-						spec.description,
-						state,
-						jstestdriver.angular.toJson(messages),
-						specLog.join('\n'),
-						elapsed
-					));
-				},
-
-				reportSuiteResults: function(){},
-
-				reportRunnerResults: onTestRunConfigurationComplete
-					
-			};
+			jasmineEnv.reporter = new Reporter(onTestDone, onTestRunConfigurationComplete);
 				
 			jasmineEnv.execute();
 			return true;
