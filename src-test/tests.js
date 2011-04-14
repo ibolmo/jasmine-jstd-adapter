@@ -38,7 +38,7 @@ describe('describe', function(){
   });
 });
 
-describe("matchers", function(){
+describe('matchers', function(){
 
   beforeEach(function(){
     this.addMatchers({
@@ -131,6 +131,20 @@ describe('test summary', function() {
   iit('should have executed all iit tests and nothing else', function() {
     expect(specs).toEqual(['nested iit', 'iit that preceeds an it']);
   });
+});
+
+  
+var ran = false;
+xdescribe('should not execute', function(){
+	it('no-op', function(){
+		ran = true;
+	});
+})
+
+describe('should not have run', function(){
+	it('should still be false', function(){
+		expect(ran).toBe(false);
+	});
 });
 
 })();

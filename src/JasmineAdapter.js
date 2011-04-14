@@ -3,20 +3,17 @@
  * @author misko@hevery.com (Misko Hevery)
  * @author olmo.maldonado@gmail.com (Olmo Maldonado)
  */
-
-(function(window) {
+(function() {
 	
-	var describes = {};
-	var beforeEachs = {};
-	var afterEachs = {};
+	var describes = [], beforeEachs = [], afterEachs = [];
+	
 	// Here we store:
 	// 0: everyone runs
 	// 1: run everything under ddescribe
 	// 2: run only iits (ignore ddescribe)
-	var exclusive = 0;
-	var collectMode = true;
+	var exclusive = 0, collectMode = true;
+
 	intercept('describe', describes);
-	intercept('xdescribe', describes);
 	intercept('beforeEach', beforeEachs);
 	intercept('afterEach', afterEachs);
 
@@ -112,15 +109,15 @@
 	}
 	
 	function playback(set) {
-		for (var name in set) set[name]();
+		for (var i = 0, l = set.length; i < l; i++) set[i]();
 	}
 
 	function intercept(functionName, collection){
 		window[functionName] = function(desc, fn){
 			if (collectMode){
-				collection[desc] = function(){
+				collection.push(function(){
 					jasmine.getEnv()[functionName](desc, fn);
-				};
+				});
 			} else {
 				jasmine.getEnv()[functionName](desc, fn);
 			}
@@ -151,7 +148,7 @@
 		jasmine.getEnv().it(name, fn);
 	};
 
-})(window);
+})();
 
 // Patch Jasmine for proper stack traces
 jasmine.Spec.prototype.fail = function (e) {
