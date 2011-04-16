@@ -20,3 +20,4 @@ else
 fi
 
 java -jar $JSTD --reset --tests "$TESTS"
+java -jar $JSTD --reset --tests "all" --config jsTestDriverIit.conf
