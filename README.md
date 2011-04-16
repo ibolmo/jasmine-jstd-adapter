@@ -24,7 +24,7 @@ Update your `jstestdriver.conf` by prepending the jasmine library and the adapte
 For example:
 
 	load:
-    - "../jasmine/lib/jasmine-0.10.0.js"
+    - "../jasmine/lib/jasmine-1.0.1.js"
     - "../JasmineAdapter/src/*"
     - "your_source_files.js"
     - "your_test_files.js"
@@ -56,14 +56,18 @@ The files located in this repo assume that the parent folder has the jasmine sou
 
 Update the paths, or pass arguments (as explained above), to reflect your own layout if you'd like to test the adapter.
 
+### JSTD 1.3.2
+
+This release has a [known bug (232)](http://code.google.com/p/js-test-driver/issues/detail?can=2&q=223&colspec=ID%20Type%20Status%20Priority%20Milestone%20Owner%20Summary&id=223) with relative paths. Quick solution is to place the `jasmine.js` and `JasmineAdapter.js` inside of the **absolute** path. In other words, make sure you do not use `..`. Other options are to: use a 1.3.1.jar or compile a jar from the HEAD (trunk) of the [JSTD][jstd] repository. 
+
 
 Changes
 -------
-1.1 - 2011-04-06 Olmo refactors and clean code into a more encapsulated adapter. 
-1.0 - 2010-12-14 Misko completely rewrites the adapter and is now a passthru for JSTD. Adds ddescribe and iit.
-0.5 - 2010-10-03 Chistoph Pojer has been improving the code and fixing bugs. Adds .sh files for simple run of server and client.
-0.2 - 2010-04-22 Misko fixes and refactors the adapter: beforeEach, afterEach, and nesting supported.
-0.1 - 2009-12-10 Olmo Initial release. Some support for beforeEach, afterEach, and matchers.
+ * 1.1 - 2011-04-06 Olmo refactors and clean code into a more encapsulated adapter. 
+ * 1.0 - 2010-12-14 Misko completely rewrites the adapter and is now a passthru for JSTD. Adds ddescribe and iit.
+ * 0.5 - 2010-10-03 Chistoph has been improving the code and fixing bugs. Adds .sh files for simple run of server and client.
+ * 0.2 - 2010-04-22 Misko fixes and refactors the adapter: beforeEach, afterEach, and nesting supported.
+ * 0.1 - 2009-12-10 Olmo Initial release. Some support for beforeEach, afterEach, and matchers.
 
 
 [jstd]: http://code.google.com/p/js-test-driver
