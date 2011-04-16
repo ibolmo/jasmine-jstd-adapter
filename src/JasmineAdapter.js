@@ -9,9 +9,9 @@ var Env = function(onTestDone, onComplete){
 	jasmine.Env.call(this);
 
 	this.specFilter = function(spec){
-		if (!exclusive) return true;
+		if (!this.exclusive) return true;
 		var blocks = spec.queue.blocks, l = blocks.length;
-		for (var i = 0; i < l; i++) if (blocks[i].func.exclusive >= exclusive) return true;
+		for (var i = 0; i < l; i++) if (blocks[i].func.exclusive >= this.exclusive) return true;
 		return false;
 	};
 
@@ -20,12 +20,15 @@ var Env = function(onTestDone, onComplete){
 
 jasmine.util.inherit(Env, jasmine.Env);
 
+// Here we store:
+// 0: everyone runs
+// 1: run everything under ddescribe
+// 2: run only iits (ignore ddescribe)
+Env.prototype.exclusive = 0;
+
 Env.prototype.execute = function(){
 	collectMode = false;
-	playback(beforeEachs);
-	playback(afterEachs);
-	playback(describes);
-	
+	playback();
 	jasmine.Env.prototype.execute.call(this);
 };
 
@@ -96,17 +99,11 @@ Reporter.prototype.reportRunnerResults = function(){
 	this.onComplete();
 };
 
-var describes = [], beforeEachs = [], afterEachs = [];
+var collectMode = true, intercepted = {};
 
-// Here we store:
-// 0: everyone runs
-// 1: run everything under ddescribe
-// 2: run only iits (ignore ddescribe)
-var exclusive = 0, collectMode = true;
-
-intercept('describe', describes);
-intercept('beforeEach', beforeEachs);
-intercept('afterEach', afterEachs);
+describe = intercept('describe');
+beforeEach = intercept('beforeEach');
+afterEach = intercept('afterEach');
 
 var template = TestCase('Jasmine Adapter Tests', null, 'jasmine test case');
 
@@ -123,52 +120,52 @@ jstestdriver.pluginRegistrar.register({
 	onTestsFinish: function(){
 		jasmine.currentEnv_ = null;
 		collectMode = true;
-		exclusive = 0; // run everything
 	}		
 
 });
 
-function playback(set) {
-	for (var i = 0, l = set.length; i < l; i++) set[i]();
-}
-
-function intercept(functionName, collection){
-	window[functionName] = function(desc, fn){
-		if (collectMode){
-			collection.push(function(){
-				jasmine.getEnv()[functionName](desc, fn);
-			});
-		} else {
-			jasmine.getEnv()[functionName](desc, fn);
-		}
+function intercept(method){
+	var bucket = intercepted[method] = [], method = window[method];
+	return function(desc, fn){
+		if (collectMode) bucket.push(function(){ method(desc, fn); });
+		else method(desc, fn); 
 	};
 }
 
-window.ddescribe = function(name, fn){
-	if (exclusive < 1) exclusive = 1; // run ddescribe only
+function playback(){
+	for (var method in intercepted){
+		var bucket = intercepted[method];
+		for (var i = 0, l = bucket.length; i < l; i++) bucket[i]();
+	}
+}
+
+})();
+
+var ddescribe = function(name, fn){
+	var env = jasmine.getEnv();
+	if (env.exclusive < 1) env.exclusive = 1; // run ddescribe only
 	
-	window.describe(name, function(){
-		var oldIt = window.it;
-		window.it = function(name, fn){
+	describe(name, function(){
+		var oldIt = it;
+		it = function(name, fn){
 			fn.exclusive = 1; // run anything under ddescribe
-			jasmine.getEnv().it(name, fn);
+			env.it(name, fn);
 		};
 		
 		try {
 			fn.call(this);
 		} finally {
-			window.it = oldIt;
+			it = oldIt;
 		};
 		
 	});
 };
 
-window.iit = function(name, fn){
-	exclusive = fn.exclusive = 2; // run only iits
-	jasmine.getEnv().it(name, fn);
+var iit = function(name, fn){
+	var env = jasmine.getEnv();
+	env.exclusive = fn.exclusive = 2; // run only iits
+	env.it(name, fn);
 };
-
-})();
 
 // Patch Jasmine for proper stack traces
 jasmine.Spec.prototype.fail = function (e) {
