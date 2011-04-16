@@ -57,6 +57,15 @@ The files located in this repo assume that the parent folder has the jasmine sou
 Update the paths, or pass arguments (as explained above), to reflect your own layout if you'd like to test the adapter.
 
 
+Changes
+-------
+1.1 - 2011-04-06 Olmo refactors and clean code into a more encapsulated adapter. 
+1.0 - 2010-12-14 Misko completely rewrites the adapter and is now a passthru for JSTD. Adds ddescribe and iit.
+0.5 - 2010-10-03 Chistoph Pojer has been improving the code and fixing bugs. Adds .sh files for simple run of server and client.
+0.2 - 2010-04-22 Misko fixes and refactors the adapter: beforeEach, afterEach, and nesting supported.
+0.1 - 2009-12-10 Olmo Initial release. Some support for beforeEach, afterEach, and matchers.
+
+
 [jstd]: http://code.google.com/p/js-test-driver
 [jstd-conf]: http://code.google.com/p/js-test-driver/wiki/ConfigurationFile
 [jasmine]: http://github.com/pivotal/jasmine
