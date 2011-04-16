@@ -4,7 +4,8 @@
  * @author olmo.maldonado@gmail.com (Olmo Maldonado)
  */
 (function(){
-	
+
+
 var Env = function(onTestDone, onComplete){
 	jasmine.Env.call(this);
 
@@ -17,7 +18,6 @@ var Env = function(onTestDone, onComplete){
 
 	this.reporter = new Reporter(onTestDone, onComplete);
 };
-
 jasmine.util.inherit(Env, jasmine.Env);
 
 // Here we store:
@@ -26,18 +26,19 @@ jasmine.util.inherit(Env, jasmine.Env);
 // 2: run only iits (ignore ddescribe)
 Env.prototype.exclusive = 0;
 
+
 Env.prototype.execute = function(){
 	collectMode = false;
 	playback();
 	jasmine.Env.prototype.execute.call(this);
 };
 
+
 var Reporter = function(onTestDone, onComplete){
 	this.onTestDone = onTestDone;
 	this.onComplete = onComplete;
 	this.reset();
 };
-
 jasmine.util.inherit(Reporter, jasmine.Reporter);
 
 
@@ -50,6 +51,7 @@ Reporter.formatStack = function(stack) {
 	}
 	return frames.join('\n');
 };
+
 
 Reporter.prototype.reset = function(){
 	this.specLog = jstestdriver.console.log_ = [];
@@ -69,9 +71,9 @@ Reporter.prototype.reportSpecStarting = function(){
 
 Reporter.prototype.reportSpecResults = function(spec){
 	var elapsed = +new Date() - this.start, results = spec.results();
-	
+
 	if (results.skipped) return;
-	
+
 	var item, state = 'passed', items = results.getItems(), l = items.length, messages = new Array(l);
 	for (var i = 0; i < l; i++){
 		item = items[i];
@@ -83,7 +85,7 @@ Reporter.prototype.reportSpecResults = function(spec){
 			stack: Reporter.formatStack(item.trace.stack)
 		});
 	}
-	
+
 	this.onTestDone(new jstestdriver.TestResult(
 		spec.suite.getFullName(),
 		spec.description,
@@ -99,6 +101,7 @@ Reporter.prototype.reportRunnerResults = function(){
 	this.onComplete();
 };
 
+
 var collectMode = true, intercepted = {};
 
 describe = intercept('describe');
@@ -108,19 +111,19 @@ afterEach = intercept('afterEach');
 var template = TestCase('Jasmine Adapter Tests', null, 'jasmine test case');
 
 jstestdriver.pluginRegistrar.register({
-	
+
 	name: 'jasmine',
-		
+
 	runTestConfiguration: function(config, onTestDone, onComplete){
 		if (config.testCaseInfo_.template_ !== template) return;
 		(jasmine.currentEnv_ = new Env(onTestDone, onComplete)).execute();
 		return true;
 	},
-		
+
 	onTestsFinish: function(){
 		jasmine.currentEnv_ = null;
 		collectMode = true;
-	}		
+	}
 
 });
 
@@ -128,7 +131,7 @@ function intercept(method){
 	var bucket = intercepted[method] = [], method = window[method];
 	return function(desc, fn){
 		if (collectMode) bucket.push(function(){ method(desc, fn); });
-		else method(desc, fn); 
+		else method(desc, fn);
 	};
 }
 
@@ -143,21 +146,19 @@ function playback(){
 
 var ddescribe = function(name, fn){
 	var env = jasmine.getEnv();
-	if (env.exclusive < 1) env.exclusive = 1; // run ddescribe only
-	
+	if (!env.exclusive) env.exclusive = 1; // run ddescribe only
 	describe(name, function(){
 		var oldIt = it;
 		it = function(name, fn){
 			fn.exclusive = 1; // run anything under ddescribe
 			env.it(name, fn);
 		};
-		
+
 		try {
 			fn.call(this);
 		} finally {
 			it = oldIt;
 		};
-		
 	});
 };
 
