@@ -101,4 +101,16 @@ describe('should not have run', function(){
 	});
 });
 
+describe('a failing suite, ignore', function(){
+	it('should fail', function(){
+		expect(false).toBe(true);
+	});
+	
+	describe('nested failure', function(){
+		it('1 + 1 != 2', function(){
+			expect(1 + 1).toNotBe(2);
+		});
+	});
+});
+
 })();

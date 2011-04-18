@@ -43,7 +43,7 @@ jasmine.util.inherit(Reporter, jasmine.Reporter);
 
 
 Reporter.formatStack = function(stack) {
-	var line, lines = (stack || '').split(/\r?\n/), l = lines.length, frames = new Array(l);
+	var line, lines = (stack || '').split(/\r?\n/), l = lines.length, frames = [];
 	for (var i = 0; i < l; i++){
 		line = lines[i];
 		if (line.match(/\/jasmine[\.-]/)) continue;
@@ -74,7 +74,7 @@ Reporter.prototype.reportSpecResults = function(spec){
 
 	if (results.skipped) return;
 
-	var item, state = 'passed', items = results.getItems(), l = items.length, messages = new Array(l);
+	var item, state = 'passed', items = results.getItems(), l = items.length, messages = [];
 	for (var i = 0; i < l; i++){
 		item = items[i];
 		if (item.passed()) continue;
@@ -85,7 +85,7 @@ Reporter.prototype.reportSpecResults = function(spec){
 			stack: Reporter.formatStack(item.trace.stack)
 		});
 	}
-
+	
 	this.onTestDone(new jstestdriver.TestResult(
 		spec.suite.getFullName(),
 		spec.description,
