@@ -101,7 +101,7 @@ describe('should not have run', function(){
 	});
 });
 
-describe('a failing suite, ignore', function(){
+xdescribe('a failing suite, ignore', function(){
 	it('should fail', function(){
 		expect(false).toBe(true);
 	});
@@ -136,6 +136,17 @@ describe('should support multiple spies and subsequent actual calls', function()
 
 	it('last test case which calls the actual function', function(){
 		expect(testObject.caller()).toEqual(-1);
+	});
+});
+
+describe("jasmine#Waits", function() {
+	var interval = 200;
+	var now = +new Date();	
+	it('waits for async assertions', function() {
+		waits(interval);
+		runs(function() {
+			expect(+new Date() - now).toBeGreaterThan(interval);
+		});
 	});
 });
 
