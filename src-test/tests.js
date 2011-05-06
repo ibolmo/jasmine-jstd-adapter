@@ -93,7 +93,7 @@ xdescribe('should not execute', function(){
 	it('no-op', function(){
 		ran = true;
 	});
-})
+});
 
 describe('should not have run', function(){
 	it('should still be false', function(){
