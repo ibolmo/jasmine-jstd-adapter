@@ -108,14 +108,15 @@ describe = intercept('describe');
 beforeEach = intercept('beforeEach');
 afterEach = intercept('afterEach');
 
-var template = TestCase('Jasmine Adapter Tests', null, 'jasmine test case');
+var JASMINE_TYPE = 'jasmine test case';
+TestCase('Jasmine Adapter Tests', null, JASMINE_TYPE);
 
 jstestdriver.pluginRegistrar.register({
 
 	name: 'jasmine',
 
 	runTestConfiguration: function(config, onTestDone, onComplete){
-		if (config.testCaseInfo_.template_ !== template) return;
+		if (config.getTestCaseInfo().getType() != JASMINE_TYPE) return false;
 		(jasmine.currentEnv_ = new Env(onTestDone, onComplete)).execute();
 		return true;
 	},
