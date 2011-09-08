@@ -114,6 +114,15 @@ TestCase('Jasmine Adapter Tests', null, JASMINE_TYPE);
 jstestdriver.pluginRegistrar.register({
 
 	name: 'jasmine',
+	
+	getTestRunsConfigurationFor: function(testCaseInfos, expressions, testRunsConfiguration) {
+          	for (var i = 0; i < testCaseInfos.length; i++) {
+                	if (testCaseInfos[i].getType() == JASMINE_TYPE) {
+            	   		testRunsConfiguration.push(testCaseInfos[i]);
+          		}
+          	}
+          	return false;
+        },
 
 	runTestConfiguration: function(config, onTestDone, onComplete){
 		if (config.getTestCaseInfo().getType() != JASMINE_TYPE) return false;
