@@ -116,12 +116,12 @@ jstestdriver.pluginRegistrar.register({
 	name: 'jasmine',
 	
 	getTestRunsConfigurationFor: function(testCaseInfos, expressions, testRunsConfiguration) {
-          	for (var i = 0; i < testCaseInfos.length; i++) {
+        	for (var i = 0; i < testCaseInfos.length; i++) {
                 	if (testCaseInfos[i].getType() == JASMINE_TYPE) {
-            	   		testRunsConfiguration.push(testCaseInfos[i]);
-          		}
-          	}
-          	return false;
+				testRunsConfiguration.push(new jstestdriver.TestRunConfiguration(testCaseInfos[i], []);
+			}
+		}
+		return false; // allow other TestCases to be collected.
         },
 
 	runTestConfiguration: function(config, onTestDone, onComplete){
