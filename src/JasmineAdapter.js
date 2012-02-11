@@ -120,11 +120,8 @@ jstestdriver.pluginRegistrar.register({
 		lastFile = file.fileSrc;
 		// Remove all the intercepted methods for this file
 		for (method in intercepted) {
-			var bucket = intercepted[method];
-			for (var i = bucket.length - 1; i >= 0; i--) {
-				if (bucket[i].file == lastFile) {
-					bucket.splice(i,1);
-				}
+			if (intercepted[method][lastFile]) {
+				intercepted[method][lastFile] = [];
 			}
 		}
 	},
@@ -152,18 +149,21 @@ jstestdriver.pluginRegistrar.register({
 });
 
 function intercept(method){
-	var bucket = intercepted[method] = [], method = window[method];
+	var bucket = intercepted[method] = {}, method = window[method];
 	return function(desc, fn){
 		if (collectMode) {
-			bucket.push({file: lastFile, intercept: function(){ method(desc, fn); }});
+			if (!bucket[lastFile]) bucket[lastFile] = [];
+			bucket[lastFile].push(function(){ method(desc, fn); });
 		} else method(desc, fn);
 	};
 }
 
 function playback(){
 	for (var method in intercepted){
-		var bucket = intercepted[method];
-		for (var i = 0, l = bucket.length; i < l; i++) bucket[i].intercept();
+		for (var file in intercepted[method]) {
+			var bucket = intercepted[method][file];
+			for (var i = 0, l = bucket.length; i < l; i++) bucket[i]();
+		}
 	}
 }
 
