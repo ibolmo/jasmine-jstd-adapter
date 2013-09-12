@@ -1,6 +1,13 @@
 Jasmine Adapter for [JsTestDriver][jstd]
 ========================================
 
+Unsupported
+-----------
+This project is kept public for historical purposes, but please proceed with caution. There are some known [issues](https://github.com/ibolmo/jasmine-jstd-adapter/issues) that you should be aware of. 
+
+I've moved to using [Karma](http://karma-runner.github.io/0.10/index.html) as JSTD replacement, and the project includes a [Jasmine adapter](https://npmjs.org/package/karma-jasmine) already.
+
+
 Author
 ------
 
