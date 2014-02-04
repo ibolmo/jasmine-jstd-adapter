@@ -102,7 +102,7 @@ Reporter.prototype.reportRunnerResults = function(){
 };
 
 
-var collectMode = true, intercepted = {};
+var collectMode = true, intercepted = {}, lastFile = undefined;
 
 describe = intercept('describe');
 beforeEach = intercept('beforeEach');
@@ -115,6 +115,17 @@ jstestdriver.pluginRegistrar.register({
 
 	name: 'jasmine',
 	
+	loadSource: function(file, onSourceLoadedCallback) {
+		var method;
+		lastFile = file.fileSrc;
+		// Remove all the intercepted methods for this file
+		for (method in intercepted) {
+			if (intercepted[method][lastFile]) {
+				intercepted[method][lastFile] = [];
+			}
+		}
+	},
+
 	getTestRunsConfigurationFor: function(testCaseInfos, expressions, testRunsConfiguration) {
         	for (var i = 0; i < testCaseInfos.length; i++) {
                 	if (testCaseInfos[i].getType() == JASMINE_TYPE) {
@@ -138,17 +149,21 @@ jstestdriver.pluginRegistrar.register({
 });
 
 function intercept(method){
-	var bucket = intercepted[method] = [], method = window[method];
+	var bucket = intercepted[method] = {}, method = window[method];
 	return function(desc, fn){
-		if (collectMode) bucket.push(function(){ method(desc, fn); });
-		else method(desc, fn);
+		if (collectMode) {
+			if (!bucket[lastFile]) bucket[lastFile] = [];
+			bucket[lastFile].push(function(){ method(desc, fn); });
+		} else method(desc, fn);
 	};
 }
 
 function playback(){
 	for (var method in intercepted){
-		var bucket = intercepted[method];
-		for (var i = 0, l = bucket.length; i < l; i++) bucket[i]();
+		for (var file in intercepted[method]) {
+			var bucket = intercepted[method][file];
+			for (var i = 0, l = bucket.length; i < l; i++) bucket[i]();
+		}
 	}
 }
 
