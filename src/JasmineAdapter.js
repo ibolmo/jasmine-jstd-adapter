@@ -4,6 +4,33 @@
  * @author olmo.maldonado@gmail.com (Olmo Maldonado)
  */
 (function(){
+var depLoadedListener = null;
+var dependenciesLoading = [];
+dependenciesLoading.pendingCount = 0;
+
+
+jasmine.dependencyLoading = function (dependencyName) {
+	if(!dependenciesLoading.pendingCount)
+		dependenciesLoading.pendingCount = 0;
+	var i = dependenciesLoading.indexOf(dependencyName)
+	if(i < 0) {
+		dependenciesLoading.push(dependencyName);
+		dependenciesLoading.pendingCount++;
+	}
+}
+
+jasmine.dependencyLoaded = function (dependencyName) {
+	var dli = dependenciesLoading.indexOf(dependencyName)
+	if(dli <0 ) {
+		return;
+	}
+	delete dependenciesLoading[dli];
+	dependenciesLoading.pendingCount--;
+	var hasMore = dependenciesLoading.pendingCount>0;
+	if(depLoadedListener) {
+		depLoadedListener(dependencyName, hasMore);
+	}
+}
 
 
 var Env = function(onTestDone, onComplete){
@@ -29,8 +56,19 @@ Env.prototype.exclusive = 0;
 
 Env.prototype.execute = function(){
 	collectMode = false;
-	playback();
-	jasmine.Env.prototype.execute.call(this);
+    if(dependenciesLoading.pendingCount == 0) {
+        playback();
+        jasmine.Env.prototype.execute.call(this);
+    } else {
+        var env = this;
+        depLoadedListener = function(depGroup, hasMore) {
+            if(!hasMore) {
+                playback();
+                jasmine.Env.prototype.execute.call(env);
+                depLoadedListener = null;
+            }
+        };
+    }
 };
 
 
