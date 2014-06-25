@@ -109,7 +109,6 @@ beforeEach = intercept('beforeEach');
 afterEach = intercept('afterEach');
 
 var JASMINE_TYPE = 'jasmine test case';
-TestCase('Jasmine Adapter Tests', null, JASMINE_TYPE);
 
 jstestdriver.pluginRegistrar.register({
 
@@ -133,8 +132,16 @@ jstestdriver.pluginRegistrar.register({
 	onTestsFinish: function(){
 		jasmine.currentEnv_ = null;
 		collectMode = true;
-	}
+	},
 
+  getTestRunsConfigurationFor: function(testCaseInfos, expressions, testRunsConfiguration){
+    testRunsConfiguration.push(
+        new jstestdriver.TestRunConfiguration(
+            new jstestdriver.TestCaseInfo(
+                'Jasmine Adapter Tests', function() {}, JASMINE_TYPE), []));
+
+    return true;
+  }
 });
 
 function intercept(method){
