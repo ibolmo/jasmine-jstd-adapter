@@ -42,6 +42,6 @@ describe('test summary', function() {
   iit('should have executed all iit tests and nothing else', function() {
     expect(specs).toEqual(['nested iit', 'iit that preceeds an it']);
   });
-});	
-	
+});
+
 })();

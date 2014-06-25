@@ -87,7 +87,7 @@ describe('runs', function(){
 	});
   });
 });
-  
+
 var ran = false;
 xdescribe('should not execute', function(){
 	it('no-op', function(){
@@ -105,7 +105,7 @@ xdescribe('a failing suite, ignore', function(){
 	it('should fail', function(){
 		expect(false).toBe(true);
 	});
-	
+
 	describe('nested failure', function(){
 		it('1 + 1 != 2', function(){
 			expect(1 + 1).toNotBe(2);
@@ -141,7 +141,7 @@ describe('should support multiple spies and subsequent actual calls', function()
 
 describe("jasmine#Waits", function() {
 	var interval = 200;
-	var now = +new Date();	
+	var now = +new Date();
 	it('waits for async assertions', function() {
 		waits(interval);
 		runs(function() {

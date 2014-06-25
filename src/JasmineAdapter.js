@@ -85,7 +85,7 @@ Reporter.prototype.reportSpecResults = function(spec){
 			stack: Reporter.formatStack(item.trace.stack)
 		});
 	}
-	
+
 	this.onTestDone(new jstestdriver.TestResult(
 		spec.suite.getFullName(),
 		spec.description,
@@ -114,7 +114,7 @@ TestCase('Jasmine Adapter Tests', null, JASMINE_TYPE);
 jstestdriver.pluginRegistrar.register({
 
 	name: 'jasmine',
-	
+
 	getTestRunsConfigurationFor: function(testCaseInfos, expressions, testRunsConfiguration) {
         	for (var i = 0; i < testCaseInfos.length; i++) {
                 	if (testCaseInfos[i].getType() == JASMINE_TYPE) {
